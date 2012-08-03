@@ -8,7 +8,7 @@ int* get_primes(int m, int* nb_primes_out) {
   for (int i = 2; i < m; i++)
     if (is_prime[i]) {
       nb_primes++;
-      int k = i;
+      int k = 2;
       int tmp;
       while ((tmp = k++ * i) < m) is_prime[tmp] = 0;
     }
@@ -46,6 +46,19 @@ int primality_check(int x, int* primes, int nb_primes) {
       return 0;
   }
   return 1;
+}
+
+char* resieve(llu lo, llu size, int* primes, int nb_primes) {
+  char* result = (char*)malloc(size * sizeof(char));
+  for (int i = 0; i < size; i++) result[i] = 1;
+  for (int i = 0; i < nb_primes; i++) {
+    llu k = lo / primes[i];
+    llu tmp;
+    while ((tmp = k++ * primes[i] - lo) < size)
+      if (tmp >= 0)
+        result[tmp] = 0;
+  }
+  return result;
 }
 
 int gcd_int(int a, int b) {
