@@ -19,7 +19,7 @@ int primality_check(int, int*, int);
 // at lo such that out[i] is equal to 0 if lo + i is a multiple
 // of an element of primes, 1 otherwise. up is not included in
 // the array.
-char* resieve(llu, llu, int*, int);
+char* resieve(lli, lli, int*, int);
 
 // GCD (using Euclide algorithm)
 int gcd_int(int, int);

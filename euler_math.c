@@ -48,15 +48,18 @@ int primality_check(int x, int* primes, int nb_primes) {
   return 1;
 }
 
-char* resieve(llu lo, llu size, int* primes, int nb_primes) {
+char* resieve(lli lo, lli size, int* primes, int nb_primes) {
   char* result = (char*)malloc(size * sizeof(char));
   for (int i = 0; i < size; i++) result[i] = 1;
   for (int i = 0; i < nb_primes; i++) {
-    llu k = lo / primes[i];
-    llu tmp;
-    while ((tmp = k++ * primes[i] - lo) < size)
-      if (tmp >= 0)
+    lli k = lo / primes[i];
+    lli tmp;
+    if (k <= 1) k = 2;
+    while ((tmp = k++ * primes[i] - lo) < size) {
+      if (tmp >= 0) {
         result[tmp] = 0;
+      }
+    }
   }
   return result;
 }
