@@ -1,4 +1,4 @@
-CFLAGS += -std=c99 -O3 -lm
+CFLAGS += -std=c99 -O3 -lm -Wall
 CC = gcc
 TIME = "Total time: %e seconds"
 
