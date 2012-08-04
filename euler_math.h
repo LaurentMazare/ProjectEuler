@@ -25,5 +25,9 @@ char* resieve(lli, lli, int*, int);
 int gcd_int(int, int);
 llu gcd_llu(llu, llu);
 
+// Euler totient function
+int phi_int(int);
+int phi_with_primes(int, int*, int);
+
 int sort_llu(const void *, const void *);
 #endif

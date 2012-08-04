@@ -91,4 +91,26 @@ int sort_llu(const void *x, const void *y) {
     return (a < b) ? -1: 0;
 }
 
+int phi_int(int n) {
+  int output = n;
+  if (n % 2 == 0) output -= output / 2;
+  while (n % 2 == 0) n /= 2;
+  for (int i = 3; i*i <= n;i++)  {
+    if (n % i == 0) output -= output / i;
+    while (n % i == 0) n /= i;
+  }
+  if (n > 1) output -= output / n;
+  return output;
+}
 
+int phi_with_primes(int n, int* primes, int nb_primes) {
+  int output = n;
+  for (int i = 0; i < nb_primes; i++) {
+    if (n % primes[i] == 0) output -= output / primes[i];
+    while (n % primes[i] == 0) n /= primes[i];
+    if (n < primes[i] * primes[i]) break;
+  } 
+  if (n > 1) output -= output / n;
+  return output;
+
+}
