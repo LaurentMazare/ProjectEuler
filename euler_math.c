@@ -23,7 +23,7 @@ int* get_primes(int m, int* nb_primes_out) {
   return primes;
 }
 
-int primality_check(int x, int* primes, int nb_primes) {
+int primality_check(llu x, int* primes, int nb_primes) {
   if (x <= primes[nb_primes-1]) {
     // Bisection search
     int lo = 0;
@@ -40,9 +40,9 @@ int primality_check(int x, int* primes, int nb_primes) {
     return (primes[lo] == x || primes[up] == x);
   }
   for (int i = 0; i < nb_primes; i++) {
-    if (x == i) // Should never happen
+    if (x == primes[i]) // Should never happen
       return 1;
-    if (x % i == 0)
+    if (x % primes[i] == 0)
       return 0;
   }
   return 1;
@@ -81,3 +81,14 @@ llu gcd_llu(llu a, llu b) {
   }
   return a;
 }
+
+int sort_llu(const void *x, const void *y) {
+  const llu a = *(llu*)x;
+  const llu b = *(llu*)y;
+  if (a > b)
+    return 1;
+  else
+    return (a < b) ? -1: 0;
+}
+
+

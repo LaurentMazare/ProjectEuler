@@ -13,7 +13,7 @@ int* get_primes(int, int*);
 
 // primality_check(x, primes, nb_primes)
 // x has to be lower than the square of the largest prime
-int primality_check(int, int*, int);
+int primality_check(llu, int*, int);
 
 // resieve(lo, size, primes, nb_primes) returns an array starting
 // at lo such that out[i] is equal to 0 if lo + i is a multiple
@@ -25,4 +25,5 @@ char* resieve(lli, lli, int*, int);
 int gcd_int(int, int);
 llu gcd_llu(llu, llu);
 
+int sort_llu(const void *, const void *);
 #endif
