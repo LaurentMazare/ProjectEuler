@@ -64,6 +64,26 @@ char* resieve(lli lo, lli size, int* primes, int nb_primes) {
   return result;
 }
 
+int is_practical(llu x, int* primes, int nb_primes) {
+  llu product = 1;
+  for (int i = 0; i < nb_primes; i++) {
+    int p = primes[i];
+    if (x == 1)
+      return 1;
+    if (p > 1 + product)
+      return 0;
+    if (x % p == 0) {
+      llu tmp_product = p;
+      while (x % p == 0) {
+        x /= p;
+        tmp_product *= p;
+      }
+      product *= (tmp_product - 1) / (p - 1);
+    }
+  }
+  return 1;
+}
+
 int gcd_int(int a, int b) {
   while (b != 0) {
     int tmp = b;

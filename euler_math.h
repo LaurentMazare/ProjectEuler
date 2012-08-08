@@ -21,6 +21,10 @@ int primality_check(llu, int*, int);
 // the array.
 char* resieve(lli, lli, int*, int);
 
+// Check that a number is practical using the characterization
+// from http://en.wikipedia.org/wiki/Practical_number
+int is_practical(llu, int*, int);
+
 // GCD (using Euclide algorithm)
 int gcd_int(int, int);
 llu gcd_llu(llu, llu);
