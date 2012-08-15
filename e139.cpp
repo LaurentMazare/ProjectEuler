@@ -28,6 +28,8 @@ int main(int argc, char* argv[]) {
             nb++;
         }
       }
+      if (a + b + c >= 100000000)
+        break;
     }
   }
   printf("%d\n", nb);
