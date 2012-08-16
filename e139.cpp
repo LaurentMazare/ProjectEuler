@@ -16,15 +16,15 @@ int main(int argc, char* argv[]) {
       int bb = b;
       int cc = c;
       while (aa + bb + cc < MAXL) {
-        aa += a;
-        bb += b;
-        cc += c;
         int min = aa < bb ? aa: bb;
         int max = aa < bb ? bb: aa;
         if (cc % (max - min) == 0) {
           long long int p = (long long int)min * MAXL + (long long int)max;
           all_pairs.insert(p);
         }
+        aa += a;
+        bb += b;
+        cc += c;
       }
       if (a + b + c >= MAXL)
         break;
