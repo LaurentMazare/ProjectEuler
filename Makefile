@@ -6,6 +6,6 @@ TIME = "Total time: %e seconds"
 %.o: %.c
 	$(CC) -c $(CFLAGS) $< -o $@
 
-%.run: %.o euler_math.o
-	$(CC) $(CFLAGS) $< euler_math.o $(LD_FLAGS) -o $*
+%.run: %.o euler_math.o euler_bitarray.o
+	$(CC) $(CFLAGS) $< euler_math.o euler_bitarray.o $(LD_FLAGS) -o $*
 	TIME=$(TIME) time ./$*
