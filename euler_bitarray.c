@@ -10,7 +10,7 @@ void bitarray_set(bitarray* b, int pos, int bit) {
 int bitarray_get(bitarray* b, int pos) {
   char c = b[pos/8];
   char mask = 1 << pos;
-  return c & mask;
+  return (c & mask) != 0;
 }
 
 bitarray* bitarray_alloc(int size) {
