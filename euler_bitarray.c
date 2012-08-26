@@ -2,14 +2,14 @@
 
 typedef char bitarray;
 void bitarray_set(bitarray* b, int pos, int bit) {
-  char mask = 1 << pos;
+  char mask = 1 << (pos % 8);
   if (!bit) mask = 0;
   b[pos/8] = b[pos/8] | mask;
 }
 
 int bitarray_get(bitarray* b, int pos) {
   char c = b[pos/8];
-  char mask = 1 << pos;
+  char mask = 1 << (pos % 8);
   return (c & mask) != 0;
 }
 
