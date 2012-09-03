@@ -132,5 +132,44 @@ int phi_with_primes(int n, int* primes, int nb_primes) {
   } 
   if (n > 1) output -= output / n;
   return output;
+}
 
+int_list* il_push(int head, int_list* tail) {
+  int_list* l = (int_list*)malloc(sizeof(int_list));
+  l->il_head = head;
+  l->il_tail = tail;
+  return l;
+}
+
+int_list* il_pop(int* head, int_list* l) {
+  int_list* tail = l->il_tail;
+  *head = l->il_head;
+  free(l);
+  return tail;
+}
+
+int il_empty(int_list* l) {
+  return l == NULL;
+}
+
+void il_print(int_list* l) {
+  while (l != NULL) {
+    printf("%d ", l->il_head);
+    l = l->il_tail;
+  }
+  printf("\n");
+}
+
+int_list** get_prime_factors(int nb) {
+  nb += 1;
+  int_list** factors = (int_list**)malloc(nb * sizeof(int_list*));
+  for (int i = 0; i < nb; i++) factors[i] = NULL;
+  if (nb > 1) factors[1] = il_push(1, NULL); 
+  for (int i = 2; i < nb; i++)
+    if (il_empty(factors[i])) {
+      int tmp, k = 1;
+      while ((tmp = k++ * i) < nb)
+        factors[tmp] = il_push(i, factors[tmp]);
+    }
+  return factors;
 }
