@@ -31,8 +31,7 @@ def s(sum_digits, mod23, digits):
   cache[key] = res
   return res
 
-print s(0, 0, 5)
-print s(23, 0, 4)
-print s(23, 0, 9)
-print s(23, 0, 42)
-print s(23, 0, 11 ** 12)
+if __name__ == "__main__":
+  print s(23, 0, 9)
+  print s(23, 0, 42)
+  print s(23, 0, 11 ** 12)
