@@ -91,4 +91,4 @@ let run nb =
   Printf.printf "Nb: %d E: %.14f\n" nb_hh e;
   ()
 
-let _ = run 8
+let _ = run 15
