@@ -17,11 +17,10 @@ def phi(n): # Euler Totient
 def c(n, level, mod):
   if level == 0: return n % mod
   p = phi(mod)
+  # We use Euler's theorem: a^phi(n) % n = 1 for a and n coprime
   p2 = pow(3, (c(n, level-1, p) + p - 2) % p, p)
   p3 = (pow(3, (c(n, level-1, phi(2*mod)) + p - 2) % p, p) - 3) / 2
   return pow(2, p2, mod) * pow(3, p3, mod) % mod
 
-
 mod = 13 ** 8
-print c(10**4, 1, mod)
 print c(10**4, 3, mod)
