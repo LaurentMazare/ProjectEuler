@@ -1,41 +1,28 @@
-(* Stern-Brocot tree based coprime iteration. *)
-let stern_brocot max f init =
-  let rec aux acc a b =
-    if a > max || b > max then acc
-    else
-      let acc = aux (f acc a b) a (a+b) in
-      aux acc b (a+b)
-  in
-  aux init 1 2
-
-module Int2Set = Set.Make( 
-  struct
-    let compare = Pervasives.compare
-    type t = int * int
-  end )
+let rec gcd a b = if b = 0 then a else gcd b (a mod b)
 
 let () =
-  let max_r = 100.0 in
-  let count acc n m =
-    let m2 = m * m and n2 = n * n and mn = m * n in
-    let x = abs (m2 - n2) in
-    let y = abs (2 * mn - n2) in
-    let x, y = min x y, max x y in
-    let z = m2 + n2 - mn in
-    if x = 0 || x = y || x*x + y*y - x*y != z*z then acc
+  let max_r = 1053779.0 in
+  let count m n =
+    if m mod 3 = n mod 3 || gcd m n > 1 then None
     else
-      let xf = float_of_int x and yf = float_of_int y and zf = float_of_int z in
-      let s = (xf +. yf +. zf) /. 2.0 in
-      let r = sqrt((s -. xf) *. (s -. yf) *. (s -. zf) /. s) in
-      let rec aux acc mult =
-        if float_of_int mult *. r > max_r then acc
-        else aux (Int2Set.add (mult * x, mult * y) acc) (mult + 1)
+      let m2 = m * m and n2 = n * n and mn = m * n in
+      let z = m2 + n2 + mn in
+      let nb_sol x y =
+        let xf = float_of_int x and yf = float_of_int y and zf = float_of_int z in
+        let s = (xf +. yf +. zf) /. 2.0 in
+        let r = sqrt((s -. xf) *. (s -. yf) *. (s -. zf) /. s) in
+        int_of_float (max_r /. r)
       in
-      aux acc 1
-    in
-  let count acc m n = count (count acc m n) n m in
-  let all_elts = stern_brocot 500 count Int2Set.empty in
-  let nb_elements = Int2Set.fold (fun _ acc -> acc + 1) all_elts 0 in
-  Format.printf "%d\n" nb_elements
+      Some (nb_sol (2*mn + m2) (2*mn + n2) + nb_sol (2*mn + m2) (m2 - n2))
+  in
+  let extr o = match o with | None -> 0 | Some c -> c in
+  let rec aux_loop acc m n =
+    let count = count m n in
+    if count = Some 0 then
+      if m = n + 1 then acc
+      else aux_loop acc (n+2) (n+1)
+    else aux_loop (acc + extr count) (m+1) n
+  in
+  Format.printf "%d\n" (aux_loop 0 2 1)
 ;;
 
