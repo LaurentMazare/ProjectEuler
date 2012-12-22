@@ -4,6 +4,7 @@
  * from Project Euler #224.
  * Also note that it x^2 + y^2 + z^2 = 2r' implies that 2 divides x,
  * y and z so it is sufficient to solve for r = 5^10.
+ * Run it with: ocamlopt.opt bigarray.cmxa e360.ml -o e360 && time ./e360
  *)
 let rec pow x n =
   if n = 0 then 1
