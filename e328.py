@@ -19,6 +19,13 @@ def c(m, n):
   cache[(m, n)] = res, where
   return res, where
 
+def log2(n):
+  alpha = 0
+  while 2**(alpha+1) - 1 < n: alpha += 1
+  return alpha, 2**alpha
+
+log2s = [log2(n) for n in xrange(0, max_n)]
+
 # The right part (after the pivot) always is a balanced tree with the deepest
 # nodes on the left, this has at most two different levels for leafs.  Worst
 # cost search is either on the node on the very right or on the node on the
@@ -28,9 +35,7 @@ def right(k, nb):
   if nb == 1: return 0
   if nb == 2: return k+1
   if nb == 3: return k+2
-  alpha = 0
-  while 2**(alpha+1) - 1 < nb: alpha += 1
-  cap = 2 ** alpha
+  alpha, cap = log2s[nb]
   occ = nb - cap + 1
   root = cap - max(0, cap/2 - occ)
   tmp = right(k, root-1) if occ <= cap / 2 else right(k+root, nb-root)
@@ -40,9 +45,7 @@ def right_bis(k, nb):
   if nb == 1: return 0
   if nb == 2: return k+1
   if nb == 3: return k+2
-  alpha = 0
-  while 2**(alpha+1) - 1 < nb: alpha += 1
-  cap = 2 ** alpha
+  alpha, cap = log2s[nb]
   occ = nb - cap + 1
   root = cap - max(0, cap/2 - occ)
   return k + root + right_bis(k+root, nb-root)
