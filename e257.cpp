@@ -1,4 +1,3 @@
-// THIS DOES NOT WORK FOR NOW
 // As I've learn a lot looking at this one, here are some notes:
 // First, a1/a2 = ((b+a)*(c+a)) / (b*c)
 // Looking at the first values, a1/a2 is only equal to 2, 3, or 4.
