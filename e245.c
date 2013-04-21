@@ -22,6 +22,6 @@ llu count_rec(int* primes, int nb_primes, llu idx, llu current_n, llu current_ph
 int main(int argc, char* argv[]) {
   int nb_primes;
   int* primes = get_primes(LIM_P, &nb_primes);
-  printf("%llu\n", count_rec(primes, nb_primes, 0, 1, 1));
+  printf("%llu\n", count_rec(primes, nb_primes, 1, 1, 1));
   return 0;
 }
