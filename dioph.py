@@ -59,6 +59,35 @@ def pell1_min(d, epsilon):
     g_i, g_im = alpha_i * g_i + g_im, g_i
   return g_i, b_i
 
+# Get the minimal solution for x^2 - d.y^2 = 4*epsilon, where epsilon can be 1 or -1
+def pell4_min(d, epsilon):
+  assert epsilon == 1 or epsilon == -1, "epsilon is different from -1 and 1"
+  d_mod_4 = d % 4
+  if d_mod_4 == 0:
+    res1 = pell1_min(D/4, epsilon)
+    if res1 == None: return None
+    return 2*res1[0], res1[1]
+  if d_mod_4 == 2 or d_mod_4 == 3:
+    res1 = pell1_min(D, epsilon)
+    if res1 == None: return None
+    return 2*res1[0], 2*res1[1]
+  assert d_mod_4 == 1, "d_mod_4 is different from one"
+  alphas, l = pqa(1, 2, d)
+  if l % 2 == 0 and epsilon == -1: return None
+  b_i, b_im = 0, 1
+  g_i, g_im = 2, -1
+  pre_l = len(alphas) - l
+  for i in xrange(0, l):
+    alpha_i = alphas[i] if i < pre_l else alphas[pre_l + (i - pre_l) % l]
+    b_i, b_im = alpha_i * b_i + b_im, b_i
+    g_i, g_im = alpha_i * g_i + g_im, g_i
+  # If l is odd, solution to the -4 equation.
+  # If l is even, solution to the +4 equation.
+  # So the only case where we have to change g and b is when l is odd and epsilon is 1
+  if l % 2 == 1 and epsilon == 1:
+    return (g_i*g_i + b_i*b_i*d)/2, g_i*b_i
+  return g_i, b_i
+
 # Yield all the solutions solution for x^2 - d.y^2 = epsilon, where epsilon can be 1 or -1
 def pell1(d, epsilon):
   min_sol = pell1_min(d, epsilon)
@@ -69,6 +98,17 @@ def pell1(d, epsilon):
   while True:
     if epsilon == 1 or n % 2 == 0: yield x, y
     x, y, n = t*x + u*y*d, t*y + u*x, n+1
+
+# Yield all the solutions solution for x^2 - d.y^2 = 4*epsilon, where epsilon can be 1 or -1
+def pell4(d, epsilon):
+  min_sol = pell4_min(d, epsilon)
+  if min_sol == None: return
+  t, u = min_sol
+  x, y = t, u
+  n = 0
+  while True:
+    if epsilon == 1 or n % 2 == 0: yield x, y
+    x, y, n = (t*x + u*y*d)/2, (t*y + u*x)/2, n+1
 
 if __name__ == "__main__":
   print "Testing GCD..."
@@ -84,5 +124,11 @@ if __name__ == "__main__":
   print "Testing pell1..."
   assert list(takewhile(lambda (x, _): x < 1000000, pell1(13, 1))) == [(649, 180), (842401, 233640)], "pell1 failed"
   assert list(takewhile(lambda (x, _): x < 1000000, pell1(13, -1))) == [(18, 5), (23382, 6485)], "pell1 failed"
+  print "Testing pell4_min..."
+  assert pell4_min(13, 1) == (11, 3), "pell4_min failed"
+  assert pell4_min(13, -1) == (3, 1), "pell4_min failed"
+  print "Testing pell4..."
+  assert list(takewhile(lambda (x, _): x < 10000, pell4(13, 1))) == [(11, 3), (119, 33), (1298, 360)], "pell4 failed"
+  assert list(takewhile(lambda (x, _): x < 10000, pell4(13, -1))) == [(3, 1), (36, 10), (393, 109), (4287, 1189)], "pell4 failed"
 
 
