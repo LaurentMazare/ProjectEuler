@@ -5,9 +5,16 @@ def gcd(x, y): return x if y == 0 else gcd(y, x % y)
 
 def extended_gcd(a, b):
   if b == 0: return (1, 0)
-  q, r = div_mod(a, b)
+  q, r = divmod(a, b)
   s, t = extended_gcd(b, r)
   return t, s - q*t
+
+# Returns s such that s*s = x if x is a perfect square.
+# Otherwise returns -1. This implementation is based on using sqrt,
+# so only valid for 'small' integers.
+def sqrt_int(x):
+  s = int(sqrt(x))
+  return s if s*s == x else -1
 
 # PQa algorithm as described in: http://www.jpr2718.org/pell.pdf
 # This performs the continued fraction expansion for (p0+sqrt(d))/q0
@@ -110,6 +117,43 @@ def pell4(d, epsilon):
     if epsilon == 1 or n % 2 == 0: yield x, y
     x, y, n = (t*x + u*y*d)/2, (t*y + u*x)/2, n+1
 
+def pell_funds_bf(d, n):
+  t, u = pell1_min(d, 1)
+  if 0 < n: l1, l2 = 0, int(sqrt((n*(t-1))/(2.0*d)))
+  else: l1, l2 = int(sqrt(-n/(1.0*d))), int(sqrt((-n*(t+1))/(2.0*d)))
+  funds = []
+  for y in xrange(l1, 1+l2):
+    x = sqrt_int(n + d*y*y)
+    if x < 0: continue
+    funds.append((x, y))
+    if (x*x+d*y*y) % n != 0 or (2*x*y) % n != 0: funds.append((-x, y))
+  return funds
+
+def pell_bf(d, n, max_x):
+  funds = pell_funds_bf(d, n)
+  sols = set()
+  for x, y in funds: sols.add((abs(x), abs(y)))
+  for t, u in pell1(d, 1):
+    added = False
+    for r, s in funds:
+      x = r*t + s*u*d
+      y = r*u + s*t
+      if abs(x) <= max_x:
+        sols.add((abs(x), abs(y)))
+        added = True
+    if not added: break
+  sols = list(sols)
+  sols.sort()
+  return sols
+
+# Find solutions to a.x^2-b.y^2=c^2
+def quad_s(a, b, c, max_x):
+  res = []
+  for x, y in pell_bf(a*b, a*c, a*max_x):
+    x, rem = divmod(x, a)
+    if rem == 0: res.append((x, y))
+  return res
+
 if __name__ == "__main__":
   print "Testing GCD..."
   assert gcd(3, 1) == 1, "GCD failed"
@@ -130,5 +174,11 @@ if __name__ == "__main__":
   print "Testing pell4..."
   assert list(takewhile(lambda (x, _): x < 10000, pell4(13, 1))) == [(11, 3), (119, 33), (1298, 360)], "pell4 failed"
   assert list(takewhile(lambda (x, _): x < 10000, pell4(13, -1))) == [(3, 1), (36, 10), (393, 109), (4287, 1189)], "pell4 failed"
+  print pell_funds_bf(13, 108)
+  print pell_funds_bf(157, 12)
+  print pell_funds_bf(13, 27)
 
-
+  print pell_bf(13, 108, 10**8)
+  print pell_bf(157, 12, 10**8)
+  print pell_bf(13, 27, 10**8)
+  print quad_s(8, 9, 72, 10**8)
