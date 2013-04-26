@@ -159,26 +159,40 @@ if __name__ == "__main__":
   assert gcd(3, 1) == 1, "GCD failed"
   assert gcd(3, 9) == 3, "GCD failed"
   assert gcd(48, 18) == 6, "GCD failed"
+
   print "Testing PQa..."
   assert pqa(11, 108, 13) == ([0, 7, 2, 1, 1, 6, 1, 1], 5), "PQa failed"
   assert pqa(0, 1, 13) == ([3, 1, 1, 1, 1, 6], 5), "PQa failed"
+
   print "Testing pell1_min..."
   assert pell1_min(13, 1) == (649, 180), "pell1_min failed"
   assert pell1_min(13, -1) == (18, 5), "pell1_min failed"
+
   print "Testing pell1..."
   assert list(takewhile(lambda (x, _): x < 1000000, pell1(13, 1))) == [(649, 180), (842401, 233640)], "pell1 failed"
   assert list(takewhile(lambda (x, _): x < 1000000, pell1(13, -1))) == [(18, 5), (23382, 6485)], "pell1 failed"
+
   print "Testing pell4_min..."
   assert pell4_min(13, 1) == (11, 3), "pell4_min failed"
   assert pell4_min(13, -1) == (3, 1), "pell4_min failed"
+
   print "Testing pell4..."
   assert list(takewhile(lambda (x, _): x < 10000, pell4(13, 1))) == [(11, 3), (119, 33), (1298, 360)], "pell4 failed"
   assert list(takewhile(lambda (x, _): x < 10000, pell4(13, -1))) == [(3, 1), (36, 10), (393, 109), (4287, 1189)], "pell4 failed"
-  print pell_funds_bf(13, 108)
-  print pell_funds_bf(157, 12)
-  print pell_funds_bf(13, 27)
 
-  print pell_bf(13, 108, 10**8)
-  print pell_bf(157, 12, 10**8)
-  print pell_bf(13, 27, 10**8)
-  print quad_s(8, 9, 72, 10**8)
+  print "Testing pell_funds_bf..."
+  r = [(11, 1), (-11, 1), (15, 3), (-15, 3), (24, 6), (-24, 6), (41, 11), (-41, 11), (80, 22), (-80, 22), (141, 39), (-141, 39)]
+  assert pell_funds_bf(13, 108) == r, "pell_funds_bf failed"
+  r = [(13, 1), (-13, 1), (10663, 851), (-10663, 851), (579160, 46222), (-579160, 46222)]
+  assert pell_funds_bf(157, 12) == r, "pell_funds_bf failed"
+  r = [(12, 3), (-12, 3), (40, 11), (-40, 11)]
+  assert pell_funds_bf(13, 27) == r, "pell_funds_bf failed"
+
+  print "Testing pell_bf..."
+  r = [(11, 1), (15, 3), (24, 6), (41, 11), (80, 22), (141, 39), (249, 69), (440, 122), (869, 241)]
+  assert pell_bf(13, 108, 1000) == r, "pell_bf failed"
+  assert pell_bf(157, 12, 10**8) == [(13, 1), (10663, 851), (579160, 46222)], "pell_bf failed"
+  assert pell_bf(13, 27, 1000) == [(12, 3), (40, 11), (220, 61), (768, 213)], "pell_bf failed"
+
+  print "Testing quad_s..."
+  assert quad_s(8, 9, 72, 1000) == [(3, 0), (9, 8), (51, 48), (297, 280)], "quad_s failed"
