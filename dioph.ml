@@ -145,6 +145,41 @@ let pqa p0 q0 d =
   let alphas, l = aux 1 0 0 1 q0 (-p0) p0 q0 (-1) None [] in
   List.rev alphas, l
 
+let pell1_min d pos =
+  let alphas, l = pqa 0 1 d in
+  let l_is_even = l mod 2 = 0 in
+  if l_is_even && not pos then
+    None
+  else 
+    let index = if l_is_even then l-1 else if pos then 2*l-1 else l-1 in
+    let alphas = Array.of_list alphas in
+    let pre_l = Array.length alphas - l in
+    let rec aux b_i b_im g_i g_im i =
+      if i = index + 1 then g_i, b_i
+      else
+        let idx = if i < pre_l then i else pre_l + (i-pre_l) mod l in
+        let alpha_i = alphas.(idx) in
+        let b_i, b_im = alpha_i * b_i + b_im, b_i in
+        let g_i, g_im = alpha_i * g_i + g_im, g_i in
+        aux b_i b_im g_i g_im (i+1)
+      in
+    Some (aux 0 1 1 0 0)
+
+(* Yield all the solutions (x, y) for x^2 - d.y^2 = eps, where eps is 1 if pos is true,
+ * -1 otherwise such that x <= max_x. *)
+let pell1 d pos max_x =
+  match pell1_min d pos with
+  | None -> []
+  | Some (t, u) ->
+      let rec aux x y n acc =
+        if max_x < x then acc
+        else
+          let acc = if pos || n mod 2 = 0 then (x, y)::acc else acc in
+          let x, y, n = t*x + u*y*d, t*y + u*x, n+1 in
+          aux x y n acc
+      in
+      List.rev (aux t u 0 [])
+
 let () =
   let test_pqa p0 q0 d =
     let alphas, l = pqa p0 q0 d in
@@ -152,4 +187,20 @@ let () =
     Format.printf "%d %d %d -> %d (%s)\n" p0 q0 d l alphas
   in
   test_pqa 11 108 13;
-  test_pqa 0 1 13
+  test_pqa 0 1 13;
+  let test_pell1min d pos =
+    let res = pell1_min d pos in
+    match res with
+    | None -> assert false
+    | Some (x, y) -> Format.printf "%d %d -> %d %d\n" d (if pos then 1 else -1) x y
+  in
+  test_pell1min 13 true;
+  test_pell1min 13 false;
+  let test_pell1 d pos =
+    let res = pell1 d pos 1000000 in
+    let str_of_pair (x, y) = Format.sprintf "(%d, %d)" x y in
+    let res = String.concat " " (List.map str_of_pair res) in
+    Format.printf "%d %d -> %s\n" d (if pos then 1 else -1) res
+  in
+  test_pell1 13 true;
+  test_pell1 13 false
