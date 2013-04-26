@@ -110,17 +110,19 @@ let prime_decomposition n =
   fun k -> List.sort compare (aux [] k)
 
 let sqrt_int x =
-  let sqrt_x = int_of_float (sqrt (float_of_int x)) in
+  let open Z in
+  let sqrt_x = Z.sqrt x in
   if sqrt_x * sqrt_x = x then Some sqrt_x else None
 
 let pqa p0 q0 d =
-  let sqrt_d = sqrt (float_of_int d) in
+  let open Z in
+  let sqrt_d = Pervasives.sqrt (to_float d) in
   let rec aux a_i a_im b_i b_im g_i g_im p_i q_i i start alphas =
-    let i = i + 1 in
-    let float_pi, float_qi = float_of_int p_i, float_of_int q_i in
+    let i = succ i in
+    let float_pi, float_qi = to_float p_i, to_float q_i in
     let xi_i = (float_pi +. sqrt_d) /. float_qi in
     let xibar_i = (float_pi -. sqrt_d) /. float_qi in
-    let alpha_i = int_of_float xi_i in
+    let alpha_i = of_float xi_i in
     let a_i, a_im = alpha_i * a_i + a_im, a_i in
     let b_i, b_im = alpha_i * b_i + b_im, b_i in
     let g_i, g_im = alpha_i * g_i + g_im, g_i in
@@ -142,12 +144,12 @@ let pqa p0 q0 d =
       let q_i = (d - p_i * p_i) / q_i in
       aux a_i a_im b_i b_im g_i g_im p_i q_i i start alphas
   in
-  let alphas, l = aux 1 0 0 1 q0 (-p0) p0 q0 (-1) None [] in
-  List.rev alphas, l
+  let alphas, l = aux one zero zero one q0 (-p0) p0 q0 minus_one None [] in
+  List.rev alphas, to_int l
 
 let pell1_min d pos =
-  let alphas, l = pqa 0 1 d in
-  let l_is_even = l mod 2 = 0 in
+  let alphas, l = pqa Z.zero Z.one d in
+  let l_is_even = l mod 2 == 0 in
   if l_is_even && not pos then
     None
   else 
@@ -159,11 +161,11 @@ let pell1_min d pos =
       else
         let idx = if i < pre_l then i else pre_l + (i-pre_l) mod l in
         let alpha_i = alphas.(idx) in
-        let b_i, b_im = alpha_i * b_i + b_im, b_i in
-        let g_i, g_im = alpha_i * g_i + g_im, g_i in
+        let b_i, b_im = Z.(alpha_i * b_i + b_im, b_i) in
+        let g_i, g_im = Z.(alpha_i * g_i + g_im, g_i) in
         aux b_i b_im g_i g_im (i+1)
       in
-    Some (aux 0 1 1 0 0)
+    Some (aux Z.zero Z.one Z.one Z.zero 0)
 
 (* Yield all the solutions (x, y) for x^2 - d.y^2 = eps, where eps is 1 if pos is true,
  * -1 otherwise such that x <= max_x. *)
@@ -175,30 +177,31 @@ let pell1 d pos max_x =
         if max_x < x then acc
         else
           let acc = if pos || n mod 2 = 0 then (x, y)::acc else acc in
-          let x, y, n = t*x + u*y*d, t*y + u*x, n+1 in
-          aux x y n acc
+          let x, y = Z.(t*x + u*y*d, t*y + u*x) in
+          aux x y (n+1) acc
       in
       List.rev (aux t u 0 [])
 
 let () =
+  let open Z in
   let test_pqa p0 q0 d =
-    let alphas, l = pqa p0 q0 d in
-    let alphas = String.concat " " (List.map string_of_int alphas) in
+    let alphas, l = pqa (of_int p0) (of_int q0) (of_int d) in
+    let alphas = String.concat " " (List.map to_string alphas) in
     Format.printf "%d %d %d -> %d (%s)\n" p0 q0 d l alphas
   in
   test_pqa 11 108 13;
   test_pqa 0 1 13;
   let test_pell1min d pos =
-    let res = pell1_min d pos in
+    let res = pell1_min (of_int d) pos in
     match res with
     | None -> assert false
-    | Some (x, y) -> Format.printf "%d %d -> %d %d\n" d (if pos then 1 else -1) x y
+    | Some (x, y) -> Format.printf "%d %d -> %s %s\n" d (if pos then 1 else -1) (to_string x) (to_string y)
   in
   test_pell1min 13 true;
   test_pell1min 13 false;
   let test_pell1 d pos =
-    let res = pell1 d pos 1000000 in
-    let str_of_pair (x, y) = Format.sprintf "(%d, %d)" x y in
+    let res = pell1 (of_int d) pos (of_int 1000000) in
+    let str_of_pair (x, y) = Format.sprintf "(%s, %s)" (to_string x) (to_string y) in
     let res = String.concat " " (List.map str_of_pair res) in
     Format.printf "%d %d -> %s\n" d (if pos then 1 else -1) res
   in
