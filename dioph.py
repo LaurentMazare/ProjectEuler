@@ -95,7 +95,7 @@ def pell4_min(d, epsilon):
     return (g_i*g_i + b_i*b_i*d)/2, g_i*b_i
   return g_i, b_i
 
-# Yield all the solutions solution for x^2 - d.y^2 = epsilon, where epsilon can be 1 or -1
+# Yield all the solutions for x^2 - d.y^2 = epsilon, where epsilon can be 1 or -1
 def pell1(d, epsilon):
   min_sol = pell1_min(d, epsilon)
   if min_sol == None: return
@@ -106,7 +106,7 @@ def pell1(d, epsilon):
     if epsilon == 1 or n % 2 == 0: yield x, y
     x, y, n = t*x + u*y*d, t*y + u*x, n+1
 
-# Yield all the solutions solution for x^2 - d.y^2 = 4*epsilon, where epsilon can be 1 or -1
+# Yield all the solutions for x^2 - d.y^2 = 4*epsilon, where epsilon can be 1 or -1
 def pell4(d, epsilon):
   min_sol = pell4_min(d, epsilon)
   if min_sol == None: return
