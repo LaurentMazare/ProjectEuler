@@ -23,10 +23,14 @@ val pell1 : Z.t -> bool -> Z.t -> (Z.t * Z.t) list
 (* Iterator version. *)
 val pell1_it: Z.t -> bool -> (Z.t * Z.t) iterator
 
+val pell1_min: Z.t -> bool -> (Z.t * Z.t) option
+
 (* [pell_bf d n max_x] returns all the positive solutions (x, y)
  * with x <= max_x for the generalized Pell equation:
  * x^2 - d.y^2 = n.
  * The fundamental solutions are generated with a brute-force approach.
  *) 
 val pell_bf : Z.t -> Z.t -> Z.t -> (Z.t * Z.t) list
+
+val pell_funds_bf : Z.t -> Z.t -> (Z.t * Z.t) list
 

@@ -6,6 +6,8 @@
  * m(2n+m+1)^2/s_m - (m+1)(2k-m)^2.s_m = m(m+1)/s_m where s_m = sqrt_(m)
  * Then we iterate over m and solve the equation as a variation of Pell equation
  * using the algorithms implemented in dioph.ml.
+ * Compile with the following command:
+ * ocamlopt.opt -I +zarith zarith.cmxa bigarray.cmxa dioph.mli dioph.ml e261.ml -o e261
  *)
 let fold_int f acc lo up =
   let rec aux acc n =
