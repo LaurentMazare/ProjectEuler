@@ -1,4 +1,6 @@
-(* This is primarly designed to work on a 64 bit architecture. *)
+(* Compile with the following command:
+ * camlopt.opt -I +zarith zarith.cmxa bigarray.cmxa dioph.mli dioph.ml -o dioph
+ *)
 let rec gcd x y = if y = 0 then x else gcd y (x mod y)
 
 let rec extended_gcd x y =
@@ -114,6 +116,9 @@ let sqrt_int x =
   let sqrt_x = Z.sqrt x in
   if sqrt_x * sqrt_x = x then Some sqrt_x else None
 
+(* The Pell solvers and PQa algorithm below come from:
+ * http://www.jpr2718.org/pell.pdf
+ *)
 let pqa p0 q0 d =
   let open Z in
   let sqrt_d = Pervasives.sqrt (to_float d) in
@@ -167,20 +172,40 @@ let pell1_min d pos =
       in
     Some (aux Z.zero Z.one Z.one Z.zero 0)
 
+(* Iterators as lazy list. *)
+type 'a iterator_ =
+  | I_end
+  | I_elt of 'a * 'a iterator
+and 'a iterator = unit -> 'a iterator_
+
+let takewhile it predicate =
+  let rec aux acc = function
+    | I_end -> acc
+    | I_elt (elt, next) ->
+        if predicate elt then
+          aux (elt::acc) (next ())
+        else acc
+  in
+  List.rev (aux [] (it ()))
+
+(* Yield all the solutions (x, y) for x^2 - d.y^2 = eps, where eps is 1 if pos is true, -1 otherwise. *)
+let pell1_it d pos =
+  match pell1_min d pos with
+  | None -> fun () -> I_end
+  | Some (t, u) ->
+      let rec next x y =
+        fun () ->
+          let elt = x, y in
+          let x, y = Z.(t*x + u*y*d, t*y + u*x) in
+          let x, y = if not pos then Z.(t*x + u*y*d, t*y + u*x) else x, y in
+          I_elt (elt, next x y)
+      in
+      next t u
+
 (* Yield all the solutions (x, y) for x^2 - d.y^2 = eps, where eps is 1 if pos is true,
  * -1 otherwise such that x <= max_x. *)
 let pell1 d pos max_x =
-  match pell1_min d pos with
-  | None -> []
-  | Some (t, u) ->
-      let rec aux x y n acc =
-        if max_x < x then acc
-        else
-          let acc = if pos || n mod 2 = 0 then (x, y)::acc else acc in
-          let x, y = Z.(t*x + u*y*d, t*y + u*x) in
-          aux x y (n+1) acc
-      in
-      List.rev (aux t u 0 [])
+  takewhile (pell1_it d pos) (fun (x, _) -> x <= max_x)
 
 let () =
   let open Z in
