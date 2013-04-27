@@ -17,8 +17,16 @@ and 'a iterator = unit -> 'a iterator_
 
 
 (* [pell1 d pos max_x] returns all the positive solutions (x, y)
- * for equation x^2 - d.y^2 = 1 if pos is true else -1. *)
+ * for equation x^2 - d.y^2 = 1 if pos is true else -1 such that
+ * x <= max_x. *)
 val pell1 : Z.t -> bool -> Z.t -> (Z.t * Z.t) list
 (* Iterator version. *)
 val pell1_it: Z.t -> bool -> (Z.t * Z.t) iterator
+
+(* [pell_bf d n max_x] returns all the positive solutions (x, y)
+ * with x <= max_x for the generalized Pell equation:
+ * x^2 - d.y^2 = n.
+ * The fundamental solutions are generated with a brute-force approach.
+ *) 
+val pell_bf : Z.t -> Z.t -> Z.t -> (Z.t * Z.t) list
 

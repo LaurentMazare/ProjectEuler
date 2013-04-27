@@ -35,7 +35,7 @@ let two_squares_1 n = (* Brillhart algorithm, 1972 *)
   in
   gcd n (sqrt_m1 n)
 
-module PS = Set.Make( 
+module PS = Set.Make(
   struct
     let compare = Pervasives.compare
     type t = int * int
@@ -207,8 +207,70 @@ let pell1_it d pos =
 let pell1 d pos max_x =
   takewhile (pell1_it d pos) (fun (x, _) -> x <= max_x)
 
+let fold_zint f acc lo up =
+  let rec aux acc n =
+    if up < n then acc
+    else aux (f acc n) Z.(n + one)
+  in
+  aux acc lo
+
+let two = Z.of_int 2
+
+(* Brute-force solver to obtain fundamental solutions of the generalized Pell
+ * equation: x^2 - d.y^2 = n. *)
+let pell_funds_bf d n =
+  match pell1_min d true with
+  | None -> assert false (* x^2 - d.y^2 always has solutions if d is not a perfect square. *)
+  | Some (t, u) ->
+      let l1, l2 =
+        let nf, tf, df = Z.to_float n, Z.to_float t, Z.to_float d in
+        if Z.zero < n then Z.zero, Z.of_float (sqrt ((nf*.(tf-.1.)) /. (2.*.df)))
+        else
+          Z.of_float (sqrt (-.nf/.df)), Z.of_float (sqrt ((-.nf*.(tf+.1.)) /. (2.*.df)))
+      in
+      let open Z in
+      let f acc y =
+        match sqrt_int (n + d*y*y) with
+        | None -> acc
+        | Some x ->
+          if x*x+d*y*y mod n = zero && (two*x*y) mod n = zero then
+            (x, y)::acc
+          else
+            (-x, y)::(x, y)::acc
+      in
+      fold_zint f [] l1 l2
+
+module ZPS = Set.Make(
+  struct
+    let compare = Pervasives.compare
+    type t = Z.t * Z.t
+  end )
+
+let pell_bf d n max_x =
+  let open Z in
+  let funds = pell_funds_bf d n in
+  let add_funds acc (x, y) = ZPS.add (abs x, abs y) acc in
+  let sols = List.fold_left add_funds ZPS.empty funds in
+  let it = pell1_it d true in
+  let rec aux acc = function
+    | I_end -> acc
+    | I_elt ((t, u), next) ->
+        let add_funds (added, acc) (r, s) =
+          let x, y = r*t + s*u*d, r*u + s*t in
+          if abs x <= max_x then
+            true, ZPS.add (abs x, abs y) acc
+          else added, acc
+        in
+        let added, acc = List.fold_left add_funds (false, acc) funds in
+        if added then aux acc (next ()) else acc
+  in
+  let sols = aux sols (it ()) in
+  let sols = ZPS.fold (fun e acc -> e::acc) sols [] in
+  List.sort Pervasives.compare sols
+
 let () =
   let open Z in
+  let str_of_pair (x, y) = Format.sprintf "(%s, %s)" (to_string x) (to_string y) in
   let test_pqa p0 q0 d =
     let alphas, l = pqa (of_int p0) (of_int q0) (of_int d) in
     let alphas = String.concat " " (List.map to_string alphas) in
@@ -226,9 +288,25 @@ let () =
   test_pell1min 13 false;
   let test_pell1 d pos =
     let res = pell1 (of_int d) pos (of_int 1000000) in
-    let str_of_pair (x, y) = Format.sprintf "(%s, %s)" (to_string x) (to_string y) in
     let res = String.concat " " (List.map str_of_pair res) in
     Format.printf "%d %d -> %s\n" d (if pos then 1 else -1) res
   in
   test_pell1 13 true;
-  test_pell1 13 false
+  test_pell1 13 false;
+  let test_pell_funds_bf d n =
+    let res = pell_funds_bf (of_int d) (of_int n) in
+    let res = String.concat " " (List.map str_of_pair res) in
+    Format.printf "Funds: %d %d -> %s\n" d n res
+  in
+  test_pell_funds_bf 13 108;
+  test_pell_funds_bf 157 12;
+  test_pell_funds_bf 13 27;
+  let test_pell_bf d n max_x =
+    let res = pell_bf (of_int d) (of_int n) (of_int max_x) in
+    let res = String.concat " " (List.map str_of_pair res) in
+    Format.printf "BF: %d %d -> %s\n" d n res
+  in
+  test_pell_bf 13 108 1000;
+  test_pell_bf 157 12 100000000;
+  test_pell_bf 13 27 1000
+ 
