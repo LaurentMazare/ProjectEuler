@@ -69,3 +69,14 @@ val pell_bf : Z.t -> Z.t -> Z.t -> (Z.t * Z.t) list
  * Pell equation: x^2 - d.y^2 = n. *)
 val pell_funds_bf : Z.t -> Z.t -> (Z.t * Z.t) list
 
+(* [pell_lmm d n max_x] returns all the positive solutions (x, y)
+ * with x <= max_x for the generalized Pell equation: x^2 - d.y^2 = n.
+ * The fundamental solutions are generated with a naive version of the LMM
+ * algorithm.
+ *) 
+val pell_lmm : Z.t -> Z.t -> Z.t -> (Z.t * Z.t) list
+val pell_funds_lmm : Z.t -> Z.t -> (Z.t * Z.t) list
+
+(* [quad_s a b c max_x] returns all the positive solutions (x, y)
+ * with x <= max_x for equation a.x^2 - b.y^2 = c. *)
+val quad_s : Z.t -> Z.t -> Z.t -> Z.t -> (Z.t * Z.t) list

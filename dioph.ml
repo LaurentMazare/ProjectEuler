@@ -243,9 +243,9 @@ module ZPS = Set.Make(
     type t = Z.t * Z.t
   end )
 
-let pell_bf d n max_x =
+let pell pell_funds d n max_x =
   let open Z in
-  let funds = pell_funds_bf d n in
+  let funds = pell_funds d n in
   let add_funds acc (x, y) = ZPS.add (abs x, abs y) acc in
   let sols = List.fold_left add_funds ZPS.empty funds in
   let it = pell1_it d true in
@@ -264,4 +264,98 @@ let pell_bf d n max_x =
   let sols = aux sols (it ()) in
   let sols = ZPS.fold (fun e acc -> e::acc) sols [] in
   List.sort Pervasives.compare sols
+
+let pell_bf d n max_x = pell pell_funds_bf d n max_x
+
+let pqa_lmm p0 q0 d =
+  let open Z in
+  let sqrt_d = Pervasives.sqrt (to_float d) in
+  let rec aux a_i a_im b_i b_im g_i g_im p_i q_i i start =
+    let i = succ i in
+    let float_pi, float_qi = to_float p_i, to_float q_i in
+    let xi_i = (float_pi +. sqrt_d) /. float_qi in
+    let xibar_i = (float_pi -. sqrt_d) /. float_qi in
+    let alpha_i = of_float xi_i in
+    let a_i, a_im = alpha_i * a_i + a_im, a_i in
+    let b_i, b_im = alpha_i * b_i + b_im, b_i in
+    let g_i, g_im = alpha_i * g_i + g_im, g_i in
+    (* Everything is now as of i. *)
+    match start with
+    | Some (p_ir, q_ir) when p_ir = p_i && q_ir = q_i -> None
+    | _ ->
+      let start =
+        match start with
+        | Some _ -> start
+        | None ->
+            if 1. < xi_i && -1. < xibar_i && xibar_i < 0. then Some (p_i, q_i)
+            else None
+      in
+      (* Update p_i and q_i for i+1. *)
+      let p_i = alpha_i * q_i - p_i in
+      let q_i = (d - p_i * p_i) / q_i in
+      if abs q_i = one then Some (g_i, b_i)
+      else aux a_i a_im b_i b_im g_i g_im p_i q_i i start
+  in
+  aux one zero zero one q0 (-p0) p0 q0 minus_one None
+
+let filter_double d n l =
+  let open Z in
+  let rec aux acc = function
+    | [] -> acc
+    | (x, y)::q ->
+        let min_sol =
+          List.fold_left
+          (fun acc (r, s) ->
+            if (x*r - d*y*s) mod n = zero && (x*s - y*r) mod n = zero && abs r <= abs x then false
+            else acc
+          )
+          true
+          q
+        in
+        let acc = if min_sol then (x, y)::acc else acc in
+        aux acc q
+  in
+  aux [] l
+
+(* Lagrange-Matthews-Mollin algorithm, once again as described in:
+ * http://www.jpr2718.org/pell.pdf
+ * Note that this version is not very efficient as the square root are computed
+ * in a brute force way.
+ *)
+let pell_funds_lmm d n =
+  let open Z in
+  let add_f acc f =
+    if n mod (f*f) = zero then
+      let m = n / (f*f) in
+      let abs_m = abs m in
+      let add_z acc z =
+        if (z * z - d) mod abs_m = zero then
+          match pqa_lmm z abs_m d with
+          | None -> acc
+          | Some (r, s) ->
+              let res = r*r - d*s*s in
+              if res = m then (f*r, f*s)::acc
+              else if res = -m then
+                match pell1_min d false with
+                | None -> acc
+                | Some (t, u) -> (f*(r*t+s*u*d), f*(r*u+s*t))::acc
+              else assert false
+        else acc
+      in
+      fold_zint add_z acc (one-abs_m) abs_m
+    else acc
+  in
+  filter_double d n (fold_zint add_f [] one (sqrt n))
+
+let pell_lmm d n max_x = pell pell_funds_lmm d n max_x
+
+let quad_s a b c max_x =
+  let open Z in
+  let res = pell_bf (a*b) (a*c) (a*max_x) in
+  let add_res acc (x, y) =
+    let x, rem = div_rem x a in
+    if rem = zero then (x, y)::acc else acc
+  in
+  List.fold_left add_res [] res
+
 

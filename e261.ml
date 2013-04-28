@@ -28,15 +28,6 @@ let sqrt_ pd =
   in
   List.fold_left mult 1 pd
 
-let quad_s a b c max_x =
-  let open Z in
-  let res = Dioph.pell_bf (a*b) (a*c) (a*max_x) in
-  let add_res acc (x, y) =
-    let x, rem = div_rem x a in
-    if rem = zero then (x, y)::acc else acc
-  in
-  List.fold_left add_res [] res
-
 let () =
   let open Z in
   let two = of_int 2 in
@@ -47,7 +38,7 @@ let () =
   let add_pivot acc m =
     let s_m = of_int (sqrt_ (pd m)) in
     let m = of_int m in
-    let s = quad_s (m/s_m) ((m+one)*s_m) (m/s_m*(m+one)) max_x in
+    let s = Dioph.quad_s (m/s_m) ((m+one)*s_m) (m/s_m*(m+one)) max_x in
     let add_one acc (x, y) =
       let two_n, two_k = x - m - one, y + m / s_m in
       if two_n mod two = zero && two_k mod two = zero then

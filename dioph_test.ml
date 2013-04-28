@@ -35,6 +35,14 @@ let () =
   test_pell_funds_bf 13 108;
   test_pell_funds_bf 157 12;
   test_pell_funds_bf 13 27;
+  let test_pell_funds_bf d n =
+    let res = pell_funds_lmm (of_int d) (of_int n) in
+    let res = String.concat " " (List.map str_of_pair res) in
+    Format.printf "Funds: %d %d -> %s\n" d n res
+  in
+  test_pell_funds_bf 13 108;
+  test_pell_funds_bf 157 12;
+  test_pell_funds_bf 13 27;
   let test_pell_bf d n max_x =
     let res = pell_bf (of_int d) (of_int n) (of_int max_x) in
     let res = String.concat " " (List.map str_of_pair res) in
