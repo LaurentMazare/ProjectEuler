@@ -1,0 +1,6 @@
+[package]
+name = "elr"
+version = "0.1.0"
+authors = ["laurent <...@gmail.com>"]
+
+[dependencies]
