@@ -1,3 +1,6 @@
+#![feature(i128_type)]
+use std::collections::HashMap;
+
 pub struct Sieve(Vec<u32>);
 
 impl Sieve {
@@ -42,6 +45,36 @@ impl Sieve {
     }
 }
 
+// Adapted from Lucy's code for ProjectEuler 10.
+pub fn sum_prime(n : i128) -> i128 {
+    let r = (n as f64).sqrt() as i128;
+    let mut vs = Vec::new();
+    for i in 1i128..(r+1) {
+        vs.push(n / i);
+    }
+    for v in (0i128..*vs.last().unwrap()).rev() {
+        vs.push(v);
+    }
+    let mut ss: HashMap<i128, i128> = HashMap::new();
+    for v in &vs {
+        ss.insert(*v, v*(v+1)/2-1);
+    }
+    for p in 2..r+1 {
+        let sp = ss[&(p-1)];
+        if ss[&p] > sp {
+            let p2 = p * p;
+            for v in &vs {
+                if *v < p2 {
+                    break;
+                }
+                let s_v = ss[v] - p*(ss[&(v/p)] - sp);
+                ss.insert(*v, s_v);
+            }
+        }
+    }
+    ss[&n]
+}
+
 fn main() {
     let sieve = Sieve::new(100);
     for n in 1..40 {
@@ -51,4 +84,5 @@ fn main() {
         }
         println!("");
     }
+    println!("{}", sum_prime(1000000000));
 }
